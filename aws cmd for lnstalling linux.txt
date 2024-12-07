@@ -1,0 +1,39 @@
+Apache:
+
+sudo yum update -y
+sudo yum install -y httpd
+ 
+Nginx:
+
+sudo amazon-linux-extras install nginx1 -y
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+Tomcat:
+
+sudo yum install -y tomcat
+sudo systemctl start tomcat
+sudo systemctl enable tomcat
+
+
+OpenVPN:
+
+sudo yum install -y OpenVPN
+
+WordPress:
+
+sudo yum install -y wget
+wget https://wordpress.org/latest.tar.gz
+tar -xzvf latest.tar.gz
+sudo mv wordpress /var/www/html/
+
+Nagios:
+
+sudo yum install -y nagios
+sudo systemctl start nagios
+sudo systemctl enable nagios
+
+Kubernetes:
+
+sudo yum install -y kubectl
+Ubuntu

@@ -1,0 +1,66 @@
+1. Set Up Your EC2 Instances
+
+Launch an EC2 instance with either Ubuntu or Red Hat as the AMI.
+Choose an instance type (e.g., t2.medium) suitable for running Kubernetes.
+Configure security groups to allow traffic on necessary ports (e.g., 6443 for Kubernetes API server, 10250 for Kubelet, 80 for HTTP).
+SSH into your instance.
+
+2. Update Your System
+For red hat:
+
+sudo yum update -y
+
+3. Install Docker
+Kubernetes uses Docker as its container runtime.
+
+sudo yum install -y docker
+sudo systemctl start docker
+sudo systemctl enable docker
+
+4. Install Kubernetes
+Add the Kubernetes repository and install the necessary packages.
+
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+sudo systemctl enable --now kubelet
+
+5. Disable Swap
+Kubernetes requires swap to be disabled.
+
+For Ubuntu and Red Hat:
+
+sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+6. Initialize Kubernetes Master
+On the master node, run:
+
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+
+
+7. Configure kubectl for the Master Node
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+8.. Install a Pod Network Add-On
+
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+9. Join Worker Nodes
+Run the command provided by kubeadm init on each worker node to join them to the cluster.
+
+10. Verify the Cluster
+On the master node, you can check the cluster status:
+
+kubectl get nodes
+

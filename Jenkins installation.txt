@@ -1,0 +1,76 @@
+Jenkins installation 
+
+1-Update the installed packages to ensure everything is up to date:
+sudo dnf update -y
+
+2-Install Java
+Jenkins requires Java to run. Install the OpenJDK 11:
+
+sudo dnf install java-11-amazon-corretto -y
+
+3-Verify the Java installation:
+java -version
+You should see output indicating that Java 11 is installed.
+
+4-Enable Jenkins Repository
+Add the Jenkins repository to your system:
+
+sudo tee /etc/yum.repos.d/jenkins.repo <<EOF
+[jenkins]
+name=Jenkins-stable
+baseurl=https://pkg.jenkins.io/redhat-stable
+gpgcheck=1
+EOF
+
+
+
+5-Import the GPG key for the Jenkins repository:
+sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+
+
+6-update the DNF Cache
+update the DNF cache to refresh the repository metadata:
+
+sudo dnf clean all
+sudo dnf makecacheStep 5: Install Jenkins
+
+7-Install Jenkins
+sudo dnf install jenkins --nogpgcheck -y
+You can also manually disable the GPG check if the above doesn't work (although this is not recommended for production):
+
+Step 9: Clean DNF Cache and Reinstall Jenkins
+Now, clean the package cache and reinstall Jenkins:
+
+sudo dnf clean all
+sudo dnf makecache
+sudo dnf install jenkins -y
+
+Step 10: Verify Jenkins Installation
+Once the installation completes, verify that Jenkins was installed correctly:
+rpm -qa | grep jenkins
+This command should show a Jenkins package if installed correctly.
+
+Step 11: Start and Enable Jenkins
+Now, try starting the Jenkins service:
+sudo systemctl start jenkins
+sudo systemctl enable Jenkins
+
+If Jenkins still doesn't start, check the status:
+sudo systemctl status Jenkins
+
+
+11: Install and Use firewalld (If you still want to use firewall-cmd)
+If you prefer using firewalld for managing firewall rules, you need to install it first.
+
+Install firewalld:
+sudo dnf install firewalld -y
+Start and Enable firewalld:
+
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+
+Add Port 8080 to the Firewall:
+
+sudo firewall-cmd --zone=public --add-port=8080/tcp --permanent
+sudo firewall-cmd --reload
+Now, you should be able to access Jenkins via http://<EC2-Public-IP>:8080.
